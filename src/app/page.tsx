@@ -3,75 +3,120 @@
 import React, { useEffect, useMemo } from "react";
 import Hero from "@/components/Hero";
 import VideoCarousel from "@/components/VideoCarousel";
-import Spinner from "@/components/Spinner";
 import { useVideoData } from "@/context/VideoDataContext";
 import { usePlayer } from "@/components/GlobalPlayerProvider";
 
+// ── Shimmer skeleton card ──────────────────────────────────────────────────
+const ShimmerCard = () => (
+  <div
+    className="sf-shimmer rounded-[10px] shrink-0"
+    style={{ width: "110px", height: "165px" }}
+  />
+);
+
+const ShimmerRow = () => (
+  <div className="py-4">
+    <div className="sf-shimmer h-5 w-40 rounded-md mx-4 mb-4" />
+    <div className="flex gap-3 px-4 overflow-hidden">
+      {Array.from({ length: 7 }).map((_, i) => (
+        <ShimmerCard key={i} />
+      ))}
+    </div>
+  </div>
+);
+
+// ── Home Page ──────────────────────────────────────────────────────────────
 const HomePage: React.FC = () => {
   const { categories, loading, error } = useVideoData();
   const { playVideo, showDetails } = usePlayer();
 
-  // --- Scroll to top after categories load ---
+  // Scroll to top on fresh load
   useEffect(() => {
-    if (!loading) {
-      window.scrollTo({ top: 0, behavior: "auto" });
-    }
+    if (!loading) window.scrollTo({ top: 0, behavior: "auto" });
   }, [loading]);
 
-  // --- Featured video (first of first category) ---
   const featuredVideo = useMemo(
     () => categories?.[0]?.videos?.[0] || null,
     [categories]
   );
 
-  // --- Loading state ---
-  if (loading && categories.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[70vh] bg-[#141414] text-white">
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-[#141414] text-white min-h-screen font-sans relative overflow-x-hidden">
-      {/* ⚠️ Error Banner */}
+    <div
+      className="min-h-screen relative overflow-x-hidden"
+      style={{ background: "var(--sf-bg-primary)", color: "var(--sf-text-primary)" }}
+    >
+      {/* ── Error Banner ──────────────────────────────────────────────── */}
       {error && (
-        <div className="bg-yellow-600 text-white text-center py-3 text-sm font-medium sticky top-0 z-50">
-          {error}
+        <div
+          className="sticky top-0 z-50 text-center py-3 text-sm font-semibold animate-fade-in"
+          style={{ background: "var(--sf-error)", color: "#fff" }}
+        >
+          ⚠️ {error}
         </div>
       )}
 
-      {/* 🎥 HERO SECTION */}
-      {featuredVideo && (
-        <div className="relative w-full h-[85vh] lg:h-[95vh]">
+      {/* ── HERO SECTION ──────────────────────────────────────────────── */}
+      {loading && !featuredVideo ? (
+        <div
+          className="w-full sf-shimmer"
+          style={{ height: "85vh" }}
+        />
+      ) : featuredVideo ? (
+        <div className="relative w-full" style={{ height: "85vh" }}>
           <Hero
             video={featuredVideo}
             onPlay={playVideo}
             onInfo={showDetails}
             isBillboard
           />
-          {/* Smooth Gradient Overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#141414] to-transparent z-10 pointer-events-none" />
+          {/* Bottom fade-into-bg gradient */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(to top, var(--sf-bg-primary) 0%, transparent 100%)",
+            }}
+          />
         </div>
-      )}
+      ) : null}
 
-      {/* 📺 CAROUSELS */}
-      <div className="relative z-10 mt-25 md:mt-37.5 space-y-10 md:space-y-14 pb-20 pl-4 md:pl-12 overflow-hidden">
-        {categories.length > 0 ? (
-          categories.map((category) => (
-            <VideoCarousel
-              key={category.id}
-              title={category.title || category.name}
-              videos={category.videos}
-              onPlay={playVideo}
-              onInfo={showDetails}
-              onExpand={showDetails}
-            />
-          ))
+      {/* ── CAROUSELS ─────────────────────────────────────────────────── */}
+      <div
+        className="relative z-10 pb-24"
+        style={{ marginTop: featuredVideo ? "-120px" : "80px" }}
+      >
+        {loading && categories.length === 0 ? (
+          // Shimmer skeleton while loading
+          <div className="space-y-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <ShimmerRow key={i} />
+            ))}
+          </div>
+        ) : categories.length > 0 ? (
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <VideoCarousel
+                key={category.id}
+                title={category.title || category.name}
+                videos={category.videos}
+                onPlay={playVideo}
+                onInfo={showDetails}
+                onExpand={showDetails}
+              />
+            ))}
+          </div>
         ) : !loading && !error ? (
-          <div className="text-center text-neutral-400 py-12 px-4">
-            No videos available at the moment.
+          <div
+            className="text-center py-20 px-4"
+            style={{ color: "var(--sf-text-secondary)" }}
+          >
+            <div className="text-5xl mb-4">📺</div>
+            <p className="text-lg font-semibold" style={{ color: "var(--sf-text-primary)" }}>
+              Nothing here yet
+            </p>
+            <p className="text-sm mt-1">
+              Content is loading or unavailable. Try refreshing.
+            </p>
           </div>
         ) : null}
       </div>

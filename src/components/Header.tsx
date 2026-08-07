@@ -113,8 +113,13 @@ const Header: React.FC = () => {
 
   const isActive = (path: string) =>
     pathname === path
-      ? "text-white font-semibold"
-      : "text-gray-300 hover:text-white transition-colors";
+      ? "font-semibold"
+      : "transition-colors";
+
+  const isActiveStyle = (path: string): React.CSSProperties =>
+    pathname === path
+      ? { color: "var(--sf-text-primary)" }
+      : { color: "var(--sf-text-secondary)" };
 
   const handleLogout = async () => {
       await logout();
@@ -123,25 +128,37 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-[var(--z-header)] transition-all duration-500 ${
         isScrolled
-          ? "bg-neutral-900/90 backdrop-blur-md shadow-lg py-2"
-          : "bg-linear-to-b from-neutral-950/80 via-neutral-900/30 to-transparent py-4"
+          ? "backdrop-blur-md shadow-2xl py-2"
+          : "py-4"
       }`}
+      style={{
+        background: isScrolled
+          ? "var(--sf-bg-topbar)"
+          : "linear-gradient(to bottom, rgba(14,14,17,0.82) 0%, rgba(14,14,17,0.4) 60%, transparent 100%)"
+      }}
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-8">
         {/* Logo & Nav */}
         <div className="flex items-center gap-6">
           <Link href="/" className="cursor-pointer">
-            <h1 className="text-2xl md:text-3xl font-bold text-red-600 tracking-wider uppercase">
-              Streamflex
+            <h1
+              className="text-xl md:text-2xl font-extrabold tracking-tight"
+              style={{
+                background: "linear-gradient(135deg, #3D50FA, #7B8FFF)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              StreamFlex
             </h1>
           </Link>
 
           {isAuthenticated && (
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
               {navLinks.map(({ name, path }) => (
-                <Link key={path} href={path} className={isActive(path)}>
+                <Link key={path} href={path} className={isActive(path)} style={isActiveStyle(path)}>
                   {name}
                 </Link>
               ))}
@@ -208,13 +225,13 @@ const Header: React.FC = () => {
               <LanguageSwitcher />
               <button
                 onClick={() => router.push("/login")}
-                className="px-4 py-1.5 text-sm font-medium bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+                className="sf-btn-accent text-sm py-2 px-4"
               >
                 {t("sign_in")}
               </button>
               <button
                 onClick={() => router.push("/signup")}
-                className="px-4 py-1.5 text-sm font-medium bg-black/30 hover:bg-black/50 rounded-md backdrop-blur-sm transition-colors"
+                className="sf-btn-secondary text-sm py-2 px-4"
               >
                 {t("sign_up")}
               </button>

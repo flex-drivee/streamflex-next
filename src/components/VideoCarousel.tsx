@@ -36,7 +36,7 @@ const debounce = <T extends (...args: any[]) => void>(fn: T, delay = 80) => {
 
 const LazyCardPlaceholder: React.FC<{ className?: string }> = memo(
   ({ className = "" }) => (
-    <div className={`${className} bg-neutral-800 rounded-lg animate-pulse`} />
+    <div className={`${className} sf-shimmer rounded-[10px]`} />
   )
 );
 

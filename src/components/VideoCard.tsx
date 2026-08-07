@@ -308,11 +308,16 @@ export default function VideoCard({
               <motion.div
                 ref={innerPortalRef}
                 key="video-popup"
-                className="bg-[#141414] rounded-lg flex flex-col cursor-pointer shadow-[0_10px_25px_rgba(0,0,0,0.75)] pointer-events-auto z-60"
+                className="rounded-xl flex flex-col cursor-pointer pointer-events-auto"
+                style={{
+                  transformOrigin: transformOrigin === 'origin-left' ? 'left center' : transformOrigin === 'origin-right' ? 'right center' : 'center center',
+                  background: "var(--sf-bg-card)",
+                  border: "1px solid var(--sf-outline)",
+                  boxShadow: "0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px var(--sf-outline)"
+                }}
                 initial={{ opacity: 0, scale: 0.85, y: 8 }}
                 animate={{ opacity: 1, scale: 1.05, y: 0, transition: { type: "spring", stiffness: 200, damping: 22, ease: [0.25, 0.1, 0.25, 1], delay: 0.18, duration: 0.42 }}}
                 exit={{ opacity: 0, scale: 0.9, y: 6, transition: { delay: 0.06, duration: 0.25, ease: [0.45, 0, 0.2, 1] }}}
-                style={{ transformOrigin: transformOrigin === 'origin-left' ? 'left center' : transformOrigin === 'origin-right' ? 'right center' : 'center center' }}
               >
                 {/* Thumbnail Area */}
                 <div className={`relative w-full overflow-hidden rounded-t-lg ${isPortrait ? "aspect-2/3" : "aspect-video"}`}>
@@ -333,45 +338,37 @@ export default function VideoCard({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={handlePlay}
-                        className="flex items-center justify-center w-8 h-8 bg-white rounded-full text-black hover:bg-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-white"
+                        className="flex items-center justify-center w-8 h-8 bg-white rounded-full text-black hover:scale-110 transition-transform focus-visible:ring-2 focus-visible:ring-white"
                       >
                         <MemoIcon name="play" className="w-5 h-5 ml-0.5" />
                       </button>
 
-                      <button onClick={handleToggleWatchLater} className="flex items-center justify-center w-8 h-8 border-2 border-gray-500 rounded-full text-white hover:border-white transition-colors bg-[#2a2a2a]/60">
+                      <button onClick={handleToggleWatchLater} className="flex items-center justify-center w-8 h-8 rounded-full text-white hover:scale-110 transition-transform" style={{background:"var(--sf-bg-elevated)",border:"1px solid var(--sf-outline)"}}>
                         <MemoIcon name={isInWatchLater(video.id) ? "check" : "plus"} className="w-5 h-5" />
                       </button>
 
-                      <button onClick={handleToggleLiked} className="flex items-center justify-center w-8 h-8 border-2 border-gray-500 rounded-full text-white hover:border-white transition-colors bg-[#2a2a2a]/60">
+                      <button onClick={handleToggleLiked} className="flex items-center justify-center w-8 h-8 rounded-full text-white hover:scale-110 transition-transform" style={{background:"var(--sf-bg-elevated)",border:"1px solid var(--sf-outline)"}}>
                         <MemoIcon name={isLiked(video.id) ? "heart" : "like"} className={`w-5 h-5 ${isLiked(video.id) ? "text-pink-500" : ""}`} />
                       </button>
                     </div>
 
                     <button
                       onClick={handleInfo}
-                      className="flex items-center justify-center w-8 h-8 border-2 border-gray-500 rounded-full text-white hover:border-white transition-colors bg-[#2a2a2a]/60"
-                    >
+                      className="flex items-center justify-center w-8 h-8 rounded-full text-white hover:scale-110 transition-transform" style={{background:"var(--sf-bg-elevated)",border:"1px solid var(--sf-outline)"}}>
                       <MemoIcon name="chevron-down" className="w-5 h-5" />
                     </button>
                   </div>
 
                   {/* Metadata Row: Match, Age, Duration */}
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-gray-300 font-semibold">
-                    {/* Match Score */}
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-semibold">
                     {video.match && video.match > 0 && (
-                        <span className="text-green-400 font-bold">{video.match}% Match</span>
+                        <span style={{color:"var(--sf-success)"}} className="font-bold">{video.match}% Match</span>
                     )}
-                    
-                    {/* Age Rating */}
                     {video.maturityRating && (
-                        <span className="border border-gray-500 text-gray-200 px-1 rounded text-[10px] uppercase">
-                            {video.maturityRating}
-                        </span>
+                        <span className="sf-badge sf-badge-year uppercase">{video.maturityRating}</span>
                     )}
-                    
-                    {/* Duration / Seasons Logic */}
                     {(video.duration || video.seasons) && (
-                        <span className="text-gray-400">
+                        <span style={{color:"var(--sf-text-secondary)"}}>
                             {video.duration 
                                 ? video.duration 
                                 : Array.isArray(video.seasons) 
@@ -380,9 +377,7 @@ export default function VideoCard({
                             }
                         </span>
                     )}
-                    
-                    {/* HD Badge */}
-                    <span className="border border-gray-500 px-1 rounded text-[10px] text-gray-400">HD</span>
+                    <span className="sf-badge sf-badge-hd">HD</span>
                   </div>
 
                   {/* Genres Row */}
